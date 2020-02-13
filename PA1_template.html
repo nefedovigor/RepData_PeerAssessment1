@@ -396,7 +396,7 @@ activity_df &lt;- read.csv(&quot;activity.csv&quot;)</code></pre>
 </div>
 <div id="what-is-the-average-daily-activity-pattern" class="section level2">
 <h2>3. What is the average daily activity pattern?</h2>
-<p>Summarising data by interval. It was made by calculating mean value for each.</p>
+<p>Summarising data by interval</p>
 <pre class="r"><code>activity_df_2 &lt;- activity_df %&gt;%
         group_by(interval) %&gt;%
         summarise(steps = mean(steps, na.rm = TRUE))</code></pre>

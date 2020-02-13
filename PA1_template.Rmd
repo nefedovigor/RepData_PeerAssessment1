@@ -52,7 +52,7 @@ median(activity_df_1$steps)
 ```
 
 ## 3. What is the average daily activity pattern?
-Summarising data by interval. It was made by calculating mean value for each.
+Summarising data by interval
 ```{r}
 activity_df_2 <- activity_df %>%
         group_by(interval) %>%
