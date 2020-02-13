@@ -4,12 +4,11 @@ output:
   html_document:
     keep_md: true
 ---
-```{r include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE)
-```
+
 
 Packages needed for processing data
-```{r}
+
+```r
 library(dplyr, quietly = TRUE)
 library(tidyr, quietly = TRUE)
 library(ggplot2, quietly = TRUE)
@@ -17,64 +16,87 @@ library(lubridate, quietly = TRUE)
 ```
 
 ## 1. Loading and preprocessing the data
-```{r}
+
+```r
 unzip("activity.zip")
 activity_df <- read.csv("activity.csv")
 ```
 Column "date" needs conversion into date format
-```{r}
+
+```r
 activity_df$date <- ymd(activity_df$date)
 ```
 
 
 ## 2. What is mean total number of steps taken per day?
 Data frame needs to be summarised by date
-```{r}
+
+```r
 activity_df_1 <- activity_df %>%
         group_by(date) %>%
         summarise(steps = sum(steps, na.rm = TRUE))
 ```
 
 Histogram showing distibution of total steps per day.
-```{r, fig.height= 4}
+
+```r
 ggplot(activity_df_1, aes(x = steps)) + geom_histogram(fill = "blue") +
         labs(title = "Total Steps per Day Distribution",
              x = "Total Steps per Day")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+
 Mean calculation
-```{r, echo = FALSE}
-mean(activity_df_1$steps)
+
+```
+## [1] 9354.23
 ```
 
 Median calculation
-```{r, echo = FALSE}
-median(activity_df_1$steps)
+
+```
+## [1] 10395
 ```
 
 ## 3. What is the average daily activity pattern?
 Summarising data by interval
-```{r}
+
+```r
 activity_df_2 <- activity_df %>%
         group_by(interval) %>%
         summarise(steps = mean(steps, na.rm = TRUE))
 ```
 
-```{r, fig.height= 4}
+
+```r
 ggplot(activity_df_2, aes(x = interval, y = steps)) + geom_line(color = "blue") +
         labs(title = "Average Steps Made Depending on Time",
              x = "Interval", y = "Average Steps")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+
 Calculation of the interval, when the maximum number of steps occurs
-```{r}
+
+```r
 activity_df_2[[which.max(activity_df_2$steps),1]]
+```
+
+```
+## [1] 835
 ```
 
 ## 4. Imputing missing values
 Check for missing values
-```{r}
+
+```r
 colSums(is.na(activity_df))
+```
+
+```
+##    steps     date interval 
+##     2304        0        0
 ```
   
 Missing values should be replaced by interval mean across all dates.
@@ -86,7 +108,8 @@ To do so there was made 3 steps for each missing value:
 3. impute the mean value instead of NA  
 On step 2, it is possible to use previously created data frame with everage 
 means across all days
-```{r}
+
+```r
 activity_df_nona <- activity_df
 for (i in which(is.na(activity_df_nona$steps))) {
         # step 1
@@ -102,29 +125,46 @@ for (i in which(is.na(activity_df_nona$steps))) {
 ```
 
 Summarising data and plotting results the same way as in second task
-```{r}
+
+```r
 activity_df_3 <- activity_df_nona %>%
         group_by(date) %>%
         summarise(steps = sum(steps))
 ```
 
-```{r, fig.height= 4}
+
+```r
 ggplot(activity_df_3, aes(x = steps)) + geom_histogram(fill = "red") + 
 labs(title = "Total Steps per Day Distribution",
              x = "Total Steps per Day")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
+
 Mean and median calculation
-```{r}
+
+```r
 mean(activity_df_3$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(activity_df_3$steps)
+```
+
+```
+## [1] 10766.19
 ```
 
 ## 5. Are there differences in activity patterns between weekdays and weekends?
 For adding factor variable depending on the type of the weekday, function "wday" 
 from lubridate package is used. The function returns an integer number of the 
 weekday. This number allows to use the "cut" function.
-```{r}
+
+```r
 activity_df_4 <- activity_df_nona %>%
         mutate(weekdays = wday(date)) %>%
         mutate(weekday.type = cut(weekdays, breaks = c(0,5,7),
@@ -133,11 +173,14 @@ activity_df_4 <- activity_df_nona %>%
         summarise(steps = mean(steps))
 ```
 
-```{r, fig.height= 6}
+
+```r
 ggplot(activity_df_4, aes(x = interval, y = steps)) + geom_line(color = "red") +
         facet_grid(weekday.type ~.) +
         labs(title = "Averaged Steps Depending on Interval",
              x = "Interval", y = "Averaged Steps Across All Days")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
 
 **An activity during the weekends are higher then during the weekdays**
